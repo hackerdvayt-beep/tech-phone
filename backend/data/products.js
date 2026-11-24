@@ -1,675 +1,422 @@
-/*
-PRODUCT STRUCTURE
-- Name: string
-- Image: string
-- Description: string
-- Category: string
-- Price: int
-- Rating: int
-- CIS: int
-- isActive: bool
-- COLOR STRUCTURE
-  - colorName: string
-  - isAvailable: bool
-- SIZE STRUCTURE
-  - sizeName: string
-  - isAvailable: bool
-- SALE STRUCTURE 
-    - isOnSale: bool
-    - saleType: string
-    - saleValue: int
-    - saleStartDate: Date
-    - saleEndDate: Date
- */
-const products = [
-  {
-    name: "Classic White Cotton T-Shirt",
-    image: "/images/image_8.png",
+const toRetailPrice = (price) => {
+  const value = Math.max(0, Math.round(Number(price) || 0));
+  const million = 1000000;
+  return Math.max(million - 10000, Math.round(value / million) * million - 10000);
+};
+
+const phone = (
+  name,
+  category,
+  price,
+  image,
+  specifications,
+  options = {}
+) => {
+  const retailPrice = toRetailPrice(price);
+  const retailOriginalPrice = toRetailPrice(
+    options.originalPrice ||
+      (options.discountPercent
+        ? retailPrice / (1 - options.discountPercent / 100)
+        : retailPrice)
+  );
+  const actualDiscount = retailOriginalPrice > retailPrice
+    ? Math.round((1 - retailPrice / retailOriginalPrice) * 100)
+    : 0;
+
+  return {
+    name,
+    image,
+    images: [...new Set(options.images || [image])].slice(0, 4),
     description:
-      "Premium cotton basic tee with a comfortable fit. Perfect for everyday wear with breathable fabric and durable stitching.",
-    category: "female",
-    price: 150000,
-    rating: 5,
-    countInStock: 50,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    // ON SALE - 25% off
-    sale: {
-      isOnSale: true,
-      saleType: "percentage",
-      saleValue: 10,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Slim Fit Denim Jeans",
-    image: "/images/image_9.png",
-    description:
-      "Modern slim fit jeans in dark wash denim. Features stretch fabric for comfort and versatile styling options.",
-    category: "female",
-    price: 450000,
-    rating: 5,
-    countInStock: 35,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Floral Summer Dress",
-    image: "/images/image_10.png",
-    description:
-      "Light and airy summer dress with floral print. Features a flattering A-line cut and comfortable cotton blend fabric.",
-    category: "female",
-    price: 500000,
-    rating: 5,
-    countInStock: 25,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: false },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Wool Blend Winter Coat",
-    image: "/images/image_11.png",
-    description:
-      "Elegant winter coat with wool blend fabric. Features double-breasted buttons and a warm inner lining.",
-    category: "jacket",
-    price: 2500000,
-    rating: 5,
-    countInStock: 15,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: false },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
-    ],
-    // ON SALE - $50 off
-    sale: {
-      isOnSale: true,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Athletic Performance Hoodie",
-    image: "/images/image_12.png",
-    description:
-      "Moisture-wicking athletic hoodie perfect for workouts or casual wear. Features zippered pockets and thumb holes.",
-    category: "female",
-    price: 400000,
-    rating: 5,
-    countInStock: 40,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Silk Evening Blouse",
-    image: "/images/image_13.png",
-    description:
-      "Elegant silk blouse with delicate detailing. Perfect for formal occasions or office wear.",
-    category: "female",
-    price: 1200000,
+      "Sản phẩm thuộc danh mục demo TECH PHONE. Tên model, giá và thông số là dữ liệu tham khảo, cần xác nhận trước khi kinh doanh.",
+    category,
+    price: retailPrice,
+    originalPrice: retailOriginalPrice,
+    specifications,
+    badge: actualDiscount > 0
+      ? `-${actualDiscount}%`
+      : options.badge || "Trả góp 0%",
     rating: 5,
     countInStock: 20,
     isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
+    colors: (options.colors || ["black", "white", "blue"]).map((colorName) => ({
+      colorName,
+      isAvailable: true,
+      priceAdjustment: 0,
+    })),
+    sizes: (options.sizes || [
+      ["256GB", 0],
+      ["512GB", 5000000],
+      ["1TB", 10000000],
+      ["2TB", 18000000],
+    ]).map(([sizeName, priceAdjustment]) => ({
+      sizeName,
+      isAvailable: true,
+      priceAdjustment,
+    })),
+    sale: { isOnSale: false, saleType: "percentage", saleValue: 0 },
+  };
+};
+
+const accessory = (
+  name,
+  price,
+  image,
+  specifications,
+  accessoryType,
+  images = [image]
+) => ({
+  ...phone(name, "accessory", price, image, specifications, {
+    originalPrice: price,
+    badge: "Trả góp 0%",
+    colors: ["black", "white"],
+    sizes: [["Standard", 0]],
+  }),
+  images,
+  accessoryType,
+});
+
+const products = [
+  phone("iPhone 18 Pro Max", "apple", 44990000, "/images/phones/iphone-18-pro-max-1.jpg", {
+    screen: "6.9 inch OLED",
+    chip: "Apple A20 Pro",
+    ram: "12GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "48MP + 48MP + 48MP",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    discountPercent: 10,
+    images: [
+      "/images/phones/iphone-18-pro-max-1.jpg",
+      "/images/phones/iphone-18-pro-max-2.jpg",
+      "/images/phones/iphone-18-pro-max-3.jpg",
+      "/images/phones/iphone-18-pro-max-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: false },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("iPhone 18 Pro", "apple", 38990000, "/images/tech/iphone-18-pro.png", {
+    screen: "6.3 inch OLED",
+    chip: "Apple A20 Pro",
+    ram: "12GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "48MP + 48MP + 48MP",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    images: [
+      "/images/phones/iphone-18-pro-1.jpg",
+      "/images/phones/iphone-18-pro-2.jpg",
+      "/images/phones/iphone-18-pro-3.jpg",
+      "/images/phones/iphone-18-pro-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Casual Linen Shorts",
-    image: "/images/image_14.png",
-    description:
-      "Comfortable linen shorts perfect for summer. Features multiple pockets and an elastic waistband.",
-    category: "female",
-    price: 250000,
-    rating: 5,
-    countInStock: 30,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: false },
-      { colorName: "pink", isAvailable: true },
+  }),
+  phone("iPhone Air", "apple", 34990000, "/images/tech/iphone-air.png", {
+    screen: "6.5 inch OLED",
+    chip: "Apple A20",
+    ram: "8GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "48MP",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    discountPercent: 10,
+    images: [
+      "/images/phones/iphone-air-1.jpg",
+      "/images/phones/iphone-air-2.jpg",
+      "/images/phones/iphone-air-3.jpg",
+      "/images/phones/iphone-air-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("iPhone 17", "apple", 28990000, "/images/tech/iphone-17.png", {
+    screen: "6.3 inch OLED",
+    chip: "Apple A19",
+    ram: "8GB",
+    storage: "256GB / 512GB",
+    camera: "48MP + 12MP",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 5000000]],
+    discountPercent: 15,
+    images: [
+      "/images/phones/iphone-17-1.jpg",
+      "/images/phones/iphone-17-2.jpg",
+      "/images/phones/iphone-17-3.jpg",
+      "/images/phones/iphone-17-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's High-Waisted Yoga Leggings",
-    image: "/images/female_1.png",
-    description:
-      "Ultra-soft yoga leggings with high waistband and moisture-wicking technology. Perfect for workouts or casual wear.",
-    category: "female",
-    price: 300000,
-    rating: 4,
-    countInStock: 45,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
+  }),
+  phone("iPhone 17e", "apple", 21990000, "/images/tech/iphone-17e.png", {
+    screen: "6.1 inch OLED",
+    chip: "Apple A19",
+    ram: "8GB",
+    storage: "256GB / 512GB",
+    camera: "48MP",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 4000000]],
+    images: [
+      "/images/phones/iphone-17e-1.png",
+      "/images/phones/iphone-17e-2.jpg",
+      "/images/phones/iphone-17e-3.jpg",
+      "/images/phones/iphone-17e-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
+  }),
+  phone("iPhone Duo", "apple", 64990000, "/images/tech/iphone-duo.png", {
+    screen: "Màn hình gập 7.6 inch",
+    chip: "Apple A20 Pro",
+    ram: "12GB",
+    storage: "512GB / 1TB / 2TB",
+    camera: "48MP kép",
+    battery: "Sạc nhanh USB-C",
+  }, {
+    images: [
+      "/images/phones/iphone-duo-1.jpg",
+      "/images/phones/iphone-duo-2.jpg",
+      "/images/phones/iphone-duo-3.jpg",
+      "/images/phones/iphone-duo-4.jpg",
     ],
-    // ON SALE - 30% off
-    sale: {
-      isOnSale: true,
-      saleType: "percentage",
-      saleValue: 30,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Leather Brown Belt",
-    image: "/images/acc_1.jpg",
-    description:
-      "Genuine leather belt with classic buckle design. Adjustable and perfect for both casual and formal occasions.",
-    category: "accessory",
-    price: 200000,
-    rating: 4,
-    countInStock: 60,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: false },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
+    sizes: [["512GB", 0], ["1TB", 7000000], ["2TB", 14000000]],
+    discountPercent: 15,
+  }),
+  phone("Samsung Galaxy S26 Ultra", "samsung", 44990000, "/images/phones/samsung-galaxy-s26-ultra-1.jpg", {
+    screen: "6.9 inch AMOLED",
+    chip: "Snapdragon flagship",
+    ram: "12GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "200MP + telephoto",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    discountPercent: 10,
+    images: [
+      "/images/phones/samsung-galaxy-s26-ultra-1.jpg",
+      "/images/phones/samsung-galaxy-s26-ultra-2.jpg",
+      "/images/phones/samsung-galaxy-s26-ultra-3.jpg",
+      "/images/phones/samsung-galaxy-s26-ultra-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("Samsung Galaxy S26+", "samsung", 35990000, "/images/phones/samsung-galaxy-s26-plus-1.jpg", {
+    screen: "6.7 inch AMOLED",
+    chip: "Exynos flagship",
+    ram: "12GB",
+    storage: "256GB / 512GB",
+    camera: "50MP đa camera",
+    battery: "4,900mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 5000000]],
+    images: [
+      "/images/phones/samsung-galaxy-s26-plus-1.jpg",
+      "/images/phones/samsung-galaxy-s26-plus-2.jpg",
+      "/images/phones/samsung-galaxy-s26-plus-3.jpg",
+      "/images/phones/samsung-galaxy-s26-plus-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Vintage Denim Jacket",
-    image: "/images/jacket_1.png",
-    description:
-      "Classic vintage-style denim jacket with distressed details. Perfect layering piece for any season.",
-    category: "jacket",
-    price: 550000,
-    rating: 5,
-    countInStock: 22,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
+  }),
+  phone("Samsung Galaxy Z Fold8", "samsung", 46990000, "/images/tech/galaxy-z-fold8.jpg", {
+    screen: "Màn hình gập AMOLED 7.6 inch",
+    chip: "Snapdragon flagship",
+    ram: "12GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "50MP đa camera",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    discountPercent: 15,
+    images: [
+      "/images/phones/samsung-galaxy-z-fold8-1.jpg",
+      "/images/phones/samsung-galaxy-z-fold8-2.jpg",
+      "/images/phones/samsung-galaxy-z-fold8-3.jpg",
+      "/images/phones/samsung-galaxy-z-fold8-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: false },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("Samsung Galaxy Z Flip8", "samsung", 42990000, "/images/phones/samsung-galaxy-z-flip8-1.jpg", {
+    screen: "Màn hình gập AMOLED 6.7 inch",
+    chip: "Snapdragon flagship",
+    ram: "12GB",
+    storage: "256GB / 512GB",
+    camera: "50MP kép",
+    battery: "4,000mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 5000000]],
+    images: [
+      "/images/phones/samsung-galaxy-z-flip8-1.jpg",
+      "/images/phones/samsung-galaxy-z-flip8-2.jpg",
+      "/images/phones/samsung-galaxy-z-flip8-3.jpg",
+      "/images/phones/samsung-galaxy-z-flip8-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's Silk Scarf",
-    image: "/images/acc_2.jpg",
-    description:
-      "Luxurious silk scarf with floral pattern. Versatile accessory that can be worn multiple ways.",
-    category: "accessory",
-    price: 180000,
-    rating: 4,
-    countInStock: 35,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: false },
-      { colorName: "pink", isAvailable: true },
+  }),
+  phone("Samsung Galaxy A57 5G", "samsung", 12990000, "/images/phones/samsung-galaxy-a57-5g-1.jpg", {
+    screen: "6.7 inch AMOLED",
+    chip: "Exynos tầm trung",
+    ram: "8GB",
+    storage: "256GB / 512GB",
+    camera: "50MP OIS",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 3000000]],
+    discountPercent: 10,
+    images: [
+      "/images/phones/samsung-galaxy-a57-5g-1.jpg",
+      "/images/phones/samsung-galaxy-a57-5g-2.jpg",
+      "/images/phones/samsung-galaxy-a57-5g-3.jpg",
+      "/images/phones/samsung-galaxy-a57-5g-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("Xiaomi 17 Ultra", "xiaomi", 39990000, "/images/phones/xiaomi-17-ultra-1.jpg", {
+    screen: "6.8 inch AMOLED",
+    chip: "Snapdragon flagship",
+    ram: "16GB",
+    storage: "512GB / 1TB",
+    camera: "Leica 1-inch multi-camera",
+    battery: "5,500mAh, sạc nhanh",
+  }, {
+    sizes: [["512GB", 0], ["1TB", 5000000]],
+    discountPercent: 15,
+    images: [
+      "/images/phones/xiaomi-17-ultra-1.jpg",
+      "/images/phones/xiaomi-17-ultra-2.jpg",
+      "/images/phones/xiaomi-17-ultra-3.jpg",
+      "/images/phones/xiaomi-17-ultra-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Business Dress Shirt",
-    image: "/images/male_2.jpg",
-    description:
-      "Professional dress shirt made from wrinkle-resistant fabric. Features spread collar and French cuffs.",
-    category: "male",
-    price: 380000,
-    rating: 5,
-    countInStock: 28,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
+  }),
+  phone("Xiaomi 17 Pro", "xiaomi", 32990000, "/images/phones/xiaomi-17-pro-1.jpg", {
+    screen: "6.4 inch AMOLED",
+    chip: "Snapdragon flagship",
+    ram: "12GB",
+    storage: "256GB / 512GB",
+    camera: "50MP Leica",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 4000000]],
+    images: [
+      "/images/phones/xiaomi-17-pro-1.jpg",
+      "/images/phones/xiaomi-17-pro-2.jpg",
+      "/images/phones/xiaomi-17-pro-3.jpg",
+      "/images/phones/xiaomi-17-pro-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
+  }),
+  phone("Redmi Note 15 Pro+", "xiaomi", 12990000, "/images/phones/redmi-note-15-pro-plus-1.jpg", {
+    screen: "6.7 inch AMOLED",
+    chip: "Snapdragon tầm trung",
+    ram: "8GB",
+    storage: "256GB / 512GB",
+    camera: "200MP",
+    battery: "6,000mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 3000000]],
+    discountPercent: 10,
+    images: [
+      "/images/phones/redmi-note-15-pro-plus-1.jpg",
+      "/images/phones/redmi-note-15-pro-plus-2.jpg",
+      "/images/phones/redmi-note-15-pro-plus-3.jpg",
+      "/images/phones/redmi-note-15-pro-plus-4.jpg",
     ],
-    // ON SALE - 20% off
-    sale: {
-      isOnSale: true,
-      saleType: "percentage",
-      saleValue: 20,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's Midi Pencil Skirt",
-    image: "/images/female_2.png",
-    description:
-      "Elegant pencil skirt in stretchy fabric. Perfect for office wear with a flattering high-waisted design.",
-    category: "female",
-    price: 280000,
-    rating: 4,
-    countInStock: 32,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: false },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
+  }),
+  phone("OPPO Find X9 Pro", "oppo", 34990000, "/images/phones/oppo-find-x9-pro-1.png", {
+    screen: "6.8 inch AMOLED",
+    chip: "MediaTek flagship",
+    ram: "16GB",
+    storage: "512GB / 1TB",
+    camera: "Hasselblad multi-camera",
+    battery: "5,500mAh, sạc nhanh",
+  }, {
+    sizes: [["512GB", 0], ["1TB", 5000000]],
+    images: [
+      "/images/phones/oppo-find-x9-pro-1.png",
+      "/images/phones/oppo-find-x9-pro-2.jpg",
+      "/images/phones/oppo-find-x9-pro-3.jpg",
+      "/images/phones/oppo-find-x9-pro-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
+  }),
+  phone("OPPO Reno15", "oppo", 14990000, "/images/phones/oppo-reno15-1.jpg", {
+    screen: "6.7 inch AMOLED",
+    chip: "MediaTek tầm trung",
+    ram: "12GB",
+    storage: "256GB / 512GB",
+    camera: "50MP portrait",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    sizes: [["256GB", 0], ["512GB", 3000000]],
+    discountPercent: 15,
+    images: [
+      "/images/phones/oppo-reno15-1.jpg",
+      "/images/phones/oppo-reno15-2.jpg",
+      "/images/phones/oppo-reno15-3.jpg",
+      "/images/phones/oppo-reno15-4.jpg",
     ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Unisex Baseball Cap",
-    image: "/images/acc_3.jpg",
-    description:
-      "Classic baseball cap with adjustable strap. Made from durable cotton with embroidered logo.",
-    category: "accessory",
-    price: 120000,
-    rating: 4,
-    countInStock: 55,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
+  }),
+  phone("Google Pixel 11 Pro XL", "google", 34990000, "/images/phones/google-pixel-11-pro-xl-1.jpg", {
+    screen: "6.8 inch OLED",
+    chip: "Google Tensor",
+    ram: "16GB",
+    storage: "256GB / 512GB / 1TB",
+    camera: "50MP triple camera",
+    battery: "5,000mAh, sạc nhanh",
+  }, {
+    discountPercent: 10,
+    images: [
+      "/images/phones/google-pixel-11-pro-xl-1.jpg",
+      "/images/phones/google-pixel-11-pro-xl-2.jpg",
+      "/images/phones/google-pixel-11-pro-xl-3.jpg",
+      "/images/phones/google-pixel-11-pro-xl-4.jpg",
     ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Polo Shirt",
-    image: "/images/male_3.jpg",
-    description:
-      "Premium cotton polo shirt with ribbed collar and cuffs. Available in multiple colors for versatile styling.",
-    category: "male",
-    price: 260000,
-    rating: 5,
-    countInStock: 40,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: false },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's Cardigan Sweater",
-    image: "/images/female_3.png",
-    description:
-      "Soft knit cardigan with button closure. Perfect for layering in cooler weather with a comfortable fit.",
-    category: "female",
-    price: 350000,
-    rating: 4,
-    countInStock: 25,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: false },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Bomber Jacket",
-    image: "/images/jacket_2.jpg",
-    description:
-      "Modern bomber jacket with ribbed cuffs and hem. Lightweight yet warm with a sleek urban design.",
-    category: "jacket",
-    price: 600000,
-    rating: 5,
-    countInStock: 18,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: false },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: true,
-      saleType: "fixed",
-      saleValue: 100000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's Ankle Boots",
-    image: "/images/female_4.png",
-    description:
-      "Stylish ankle boots with block heel. Made from premium materials with comfortable cushioned insole.",
-    category: "female",
-    price: 480000,
-    rating: 4,
-    countInStock: 30,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: false },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Chino Pants",
-    image: "/images/male_4.jpg",
-    description:
-      "Versatile chino pants in classic fit. Made from cotton twill with clean tailoring for smart-casual looks.",
-    category: "male",
-    price: 320000,
-    rating: 4,
-    countInStock: 35,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Crew Neck Sweater",
-    image: "/images/male_6.jpg",
-    description:
-      "Warm crew neck sweater in merino wool blend. Classic fit with ribbed trim for a timeless look.",
-    category: "male",
-    price: 520000,
-    rating: 5,
-    countInStock: 22,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: false },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Women's Wrap Dress",
-    image: "/images/female_4.png",
-    description:
-      "Flattering wrap dress in jersey fabric. Features three-quarter sleeves and a tie waist for an elegant silhouette.",
-    category: "female",
-    price: 450000,
-    rating: 4,
-    countInStock: 28,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: false },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Graphic Print T-Shirt",
-    image: "/images/male_7.jpg",
-    description:
-      "Trendy graphic print t-shirt made from soft cotton blend. Features unique artwork and comfortable regular fit.",
-    category: "male",
-    price: 220000,
-    rating: 4,
-    countInStock: 42,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: true },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: false },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
-  {
-    name: "Men's Dark Wash Jeans",
-    image: "/images/male_8.jpg",
-    description:
-      "Classic straight-leg jeans in premium denim. Features five-pocket design and reinforced stitching for durability.",
-    category: "male",
-    price: 440000,
-    rating: 5,
-    countInStock: 38,
-    isActive: true,
-    colors: [
-      { colorName: "blue", isAvailable: true },
-      { colorName: "black", isAvailable: true },
-      { colorName: "pink", isAvailable: false },
-    ],
-    sizes: [
-      { sizeName: "M", isAvailable: true },
-      { sizeName: "L", isAvailable: true },
-      { sizeName: "XL", isAvailable: true },
-    ],
-    sale: {
-      isOnSale: false,
-      saleType: "fixed",
-      saleValue: 200000,
-      saleStartDate: new Date("2025-07-30"),
-      saleEndDate: new Date("2026-01-30"),
-    },
-  },
+  }),
+  accessory("AirPods Pro 3", 6490000, "/images/accessories/airpods-pro-3-1.jpg", {
+    screen: "Không có",
+    chip: "Apple H-series",
+    ram: "Không áp dụng",
+    storage: "Không áp dụng",
+    camera: "Không có",
+    battery: "Chống ồn chủ động",
+  }, "earphone", [
+    "/images/accessories/airpods-pro-3-1.jpg",
+    "/images/accessories/airpods-pro-3-2.jpg",
+    "/images/accessories/airpods-pro-3-3.jpg",
+    "/images/accessories/airpods-pro-3-4.jpg",
+  ]),
+  accessory("Apple Watch Series 12", 11990000, "/images/accessories/apple-watch-series-12-1.jpg", {
+    screen: "OLED",
+    chip: "Apple S-series",
+    ram: "Không công bố",
+    storage: "Không công bố",
+    camera: "Không có",
+    battery: "Theo dõi sức khỏe",
+  }, "watch-band", [
+    "/images/accessories/apple-watch-series-12-1.jpg",
+    "/images/accessories/apple-watch-series-12-2.png",
+    "/images/accessories/apple-watch-series-12-3.jpeg",
+    "/images/accessories/apple-watch-series-12-4.jpg",
+  ]),
+  accessory("Samsung Galaxy Watch9", 8990000, "/images/accessories/samsung-galaxy-watch9-1.jpg", {
+    screen: "AMOLED",
+    chip: "Exynos wearable",
+    ram: "Không công bố",
+    storage: "Không công bố",
+    camera: "Không có",
+    battery: "Theo dõi sức khỏe",
+  }, "watch-band", [
+    "/images/accessories/samsung-galaxy-watch9-1.jpg",
+    "/images/accessories/samsung-galaxy-watch9-2.jpg",
+    "/images/accessories/samsung-galaxy-watch9-3.jpg",
+  ]),
+  accessory("Sạc nhanh GaN 65W", 990000, "/images/accessories/gan-65w-charger-1.jpg", {
+    screen: "Không có",
+    chip: "GaN 65W",
+    ram: "Không áp dụng",
+    storage: "Không áp dụng",
+    camera: "Không có",
+    battery: "USB-C PD",
+  }, "charger", [
+    "/images/accessories/gan-65w-charger-1.jpg",
+    "/images/accessories/gan-65w-charger-2.jpg",
+    "/images/accessories/gan-65w-charger-3.jpg",
+    "/images/accessories/gan-65w-charger-4.jpg",
+  ]),
+  accessory("Ốp lưng MagSafe", 1490000, "/images/accessories/magsafe-case-1.jpg", {
+    screen: "Không có",
+    chip: "Không áp dụng",
+    ram: "Không áp dụng",
+    storage: "Không áp dụng",
+    camera: "Không có",
+    battery: "Tương thích MagSafe",
+  }, "case", [
+    "/images/accessories/magsafe-case-1.jpg",
+    "/images/accessories/magsafe-case-2.jpg",
+    "/images/accessories/magsafe-case-3.jpg",
+  ]),
 ];
 
 export default products;

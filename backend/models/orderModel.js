@@ -20,6 +20,7 @@ const orderSchema = mongoose.Schema(
         },
         color: { type: String },
         size: { type: String },
+        bundleDiscountPercent: { type: Number, default: 0 },
       },
     ],
     shippingAddress: {
@@ -31,6 +32,10 @@ const orderSchema = mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
+    },
+    installmentRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "InstallmentRequest",
     },
     paymentResult: {
       id: { type: String },

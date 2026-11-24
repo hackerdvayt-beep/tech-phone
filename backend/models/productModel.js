@@ -24,12 +24,17 @@ const colorSchema = mongoose.Schema(
       type: String,
       required: true,
       // Based on figma
-      enum: ["blue", "black", "pink"],
+      enum: ["blue", "black", "pink", "white", "lavender", "cream", "pistachio"],
     },
     isAvailable: {
       type: Boolean,
       required: true,
       default: true,
+    },
+    priceAdjustment: {
+      type: Number,
+      required: true,
+      default: 0,
     },
   },
   {
@@ -43,12 +48,17 @@ const sizeSchema = mongoose.Schema(
       type: String,
       required: true,
       // Based on figma
-      enum: ["M", "L", "XL"],
+      enum: ["128GB", "256GB", "512GB", "1TB", "2TB", "Standard"],
     },
     isAvailable: {
       type: Boolean,
       required: true,
       default: true,
+    },
+    priceAdjustment: {
+      type: Number,
+      required: true,
+      default: 0,
     },
   },
   {
@@ -137,10 +147,33 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    images: {
+      type: [String],
+      default: [],
+    },
     category: {
       type: String,
       required: true,
-      enum: ["female", "male", "jacket", "accessory"],
+      enum: ["apple", "samsung", "xiaomi", "oppo", "google", "accessory"],
+    },
+    accessoryType: {
+      type: String,
+      default: "",
+      enum: [
+        "",
+        "case",
+        "earphone",
+        "charger",
+        "keyboard",
+        "watch-band",
+        "mouse",
+        "pen",
+        "airtag",
+        "tv",
+        "applecare",
+        "trackpad",
+        "cleaning",
+      ],
     },
     description: {
       type: String,
@@ -165,6 +198,23 @@ const productSchema = mongoose.Schema(
       required: true,
       default: 0,
       min: 0,
+    },
+    originalPrice: {
+      type: Number,
+      min: 0,
+    },
+    specifications: {
+      screen: { type: String, default: "" },
+      chip: { type: String, default: "" },
+      ram: { type: String, default: "" },
+      storage: { type: String, default: "" },
+      camera: { type: String, default: "" },
+      battery: { type: String, default: "" },
+    },
+    badge: {
+      type: String,
+      default: "",
+      trim: true,
     },
     countInStock: {
       type: Number,
