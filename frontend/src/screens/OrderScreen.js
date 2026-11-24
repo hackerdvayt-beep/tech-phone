@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, ListGroup, Image, Card, Button } from "react-bootstrap";
+import axios from "axios";
+import {
+  Row,
+  Col,
+  ListGroup,
+  Image,
+  Card,
+  Button,
+  Alert,
+} from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
@@ -30,6 +39,31 @@ const OrderScreen = ({ match, history }) => {
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
+  const [bankConfig, setBankConfig] = useState(null);
+  const [bankConfigError, setBankConfigError] = useState("");
+  const [bankQrError, setBankQrError] = useState(false);
+
+  useEffect(() => {
+    if (order?.paymentMethod !== "Bank QR" || order.isPaid) return undefined;
+    let active = true;
+    axios
+      .get("/api/payment/bank/config")
+      .then(({ data }) => {
+        if (active) setBankConfig(data);
+      })
+      .catch((requestError) => {
+        if (active) {
+          setBankConfigError(
+            requestError.response?.data?.message ||
+              "Không thể tải thông tin thanh toán ngân hàng"
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [order?._id, order?.paymentMethod, order?.isPaid]);
 
   if (!loading) {
     //   Calculate prices
@@ -115,8 +149,101 @@ const OrderScreen = ({ match, history }) => {
                 <Message variant="success">
                   Đã thanh toán vào {order.paidAt}
                 </Message>
+              ) : order.paymentMethod === "COD" ? (
+                <Message variant="info">
+                  Thanh toán khi nhận hàng (COD)
+                </Message>
+              ) : order.paymentMethod === "Installment" ? (
+                <Message variant="info">
+                  {order.installmentRequest?.status ||
+                    "Chờ nhân viên liên hệ tư vấn trả góp"}
+                </Message>
               ) : (
-                <Message variant="danger">Chưa thanh toán</Message>
+                <Message variant="danger">
+                  {order.paymentMethod === "Bank QR"
+                    ? "Đang chờ chuyển khoản"
+                    : "Chưa thanh toán"}
+                </Message>
+              )}
+              {order.paymentMethod === "Installment" &&
+                order.installmentRequest && (
+                  <Alert variant="info" className="mt-3 mb-0">
+                    Trả trước{" "}
+                    <strong>
+                      {order.installmentRequest.downPaymentPercent}%
+                    </strong>{" "}
+                    (
+                    {Number(
+                      order.installmentRequest.downPaymentAmount
+                    ).toLocaleString("vi-VN")}
+                    ₫), kỳ hạn{" "}
+                    <strong>{order.installmentRequest.termMonths} tháng</strong>
+                    . Khoản góp dự kiến mỗi tháng:{" "}
+                    <strong>
+                      {Number(
+                        order.installmentRequest.monthlyPayment
+                      ).toLocaleString("vi-VN")}
+                      ₫
+                    </strong>
+                    . Nhân viên sẽ liên hệ tư vấn; đây chưa phải xác nhận duyệt
+                    hồ sơ.
+                  </Alert>
+                )}
+              {order.paymentMethod === "Bank QR" && !order.isPaid && (
+                <Alert variant="info" className="mt-3">
+                  <h5>Quét mã để chuyển khoản</h5>
+                  {bankConfigError ? (
+                    <p className="mb-0">{bankConfigError}</p>
+                  ) : bankConfig?.configured ? (
+                    <>
+                      <Image
+                        src={`https://img.vietqr.io/image/${encodeURIComponent(
+                          bankConfig.bankCode
+                        )}-${encodeURIComponent(
+                          bankConfig.accountNumber
+                        )}-compact2.png?amount=${Math.round(
+                          Number(order.totalPrice)
+                        )}&addInfo=${encodeURIComponent(
+                          `TECHPHONE ${order._id}`
+                        )}&accountName=${encodeURIComponent(
+                          bankConfig.accountName
+                        )}`}
+                        alt="Mã QR chuyển khoản đơn hàng"
+                        width={240}
+                        className="d-block mb-3"
+                        onError={() => setBankQrError(true)}
+                      />
+                      {bankQrError && (
+                        <p role="alert">
+                          Không tải được mã QR. Bạn có thể chuyển khoản thủ
+                          công theo thông tin tài khoản bên dưới.
+                        </p>
+                      )}
+                      <p className="mb-1">
+                        Ngân hàng: <strong>{bankConfig.bankCode}</strong>
+                      </p>
+                      <p className="mb-1">
+                        Chủ tài khoản: <strong>{bankConfig.accountName}</strong>
+                      </p>
+                      <p className="mb-1">
+                        Số tài khoản:{" "}
+                        <strong>{bankConfig.accountNumber}</strong>
+                      </p>
+                      <p className="mb-0">
+                        Nội dung: <strong>TECHPHONE {order._id}</strong> · Số
+                        tiền:{" "}
+                        <strong>
+                          {Number(order.totalPrice).toLocaleString("vi-VN")}₫
+                        </strong>
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mb-0">
+                      Tài khoản nhận tiền chưa được cấu hình. Vui lòng liên hệ
+                      cửa hàng để được hỗ trợ.
+                    </p>
+                  )}
+                </Alert>
               )}
             </ListGroup.Item>
 
@@ -184,7 +311,10 @@ const OrderScreen = ({ match, history }) => {
                   <Col>{order.totalPrice} VNĐ</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
+              {!order.isPaid &&
+                !["Bank QR", "COD", "Installment"].includes(
+                  order.paymentMethod
+                ) && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
                   <Button

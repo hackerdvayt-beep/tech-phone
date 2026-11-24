@@ -1,62 +1,52 @@
 import React from "react";
 import { Row, Col, Card } from "react-bootstrap";
 
-const CategoryGrid = ({ products = [], onCategorySelect }) => {
+const categoryImages = {
+  apple: "/images/tech/iphone-duo.png",
+  samsung: "/images/categories/category-samsung.png",
+  xiaomi: "/images/categories/category-xiaomi.png",
+  oppo: "/images/categories/category-oppo.png",
+  google: "/images/categories/category-google.png",
+  accessory: "/images/tech/airpods.jpg",
+};
+
+const CategoryGrid = ({ onCategorySelect }) => {
   const categories = [
-    { key: "male", label: "Nam" },
-    { key: "female", label: "Nữ" },
-    { key: "jacket", label: "Áo Khoác" },
+    { key: "apple", label: "Apple" },
+    { key: "samsung", label: "Samsung" },
+    { key: "xiaomi", label: "Xiaomi" },
+    { key: "oppo", label: "OPPO" },
+    { key: "google", label: "Google" },
     { key: "accessory", label: "Phụ Kiện" },
   ];
-
-  // Get random product image from each category
-  const getRandomProductImage = (categoryKey) => {
-    const categoryProducts = products.filter(
-      (product) => product.category === categoryKey && product.isActive
-    );
-
-    if (categoryProducts.length > 0) {
-      const randomProduct =
-        categoryProducts[Math.floor(Math.random() * categoryProducts.length)];
-      return randomProduct.image;
-    }
-
-    // Fallback images if no products found
-    const fallbackImages = {
-      male: "/images/male_2.jpg",
-      female: "/images/female_1.png",
-      jacket: "/images/jacket_1.png",
-      accessory: "/images/acc_1.jpg",
-    };
-
-    return fallbackImages[categoryKey] || "/images/image_1.png";
-  };
-
-  // Count products in each category
-  const getCategoryCount = (categoryKey) => {
-    return products.filter(
-      (product) => product.category === categoryKey && product.isActive
-    ).length;
-  };
 
   return (
     <div className="my-5">
       <h1 className="fw-bold text-center">ĐA DẠNG BỘ SƯU TẬP</h1>
 
-      <Row className="g-3">
+      <Row className="g-3 category-grid-row">
         {categories.map((category) => (
-          <Col key={category.key} xs={6} md={3}>
+          <Col key={category.key} xs={6} sm={4} lg={2}>
             <Card
               className="category-card h-100 border-0 "
               onClick={() => onCategorySelect && onCategorySelect(category.key)}
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                maxWidth: "360px",
+                margin: "0 auto",
+              }}
             >
               <div className="category-image-wrapper">
                 <Card.Img
                   variant="top"
-                  src={getRandomProductImage(category.key)}
+                  src={categoryImages[category.key]}
                   alt={category.label}
-                  className="category-image"
+                  className={`category-image ${category.key === "apple" ? "category-image--apple" : ""}`}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = "/images/tech/iphone-18-pro.png";
+                  }}
                 />
               </div>
 

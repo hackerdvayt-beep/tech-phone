@@ -17,6 +17,11 @@ const createProduct = asyncHandler(async (req, res) => {
     isActive,
     colors,
     sizes,
+    images,
+    accessoryType,
+    originalPrice,
+    specifications,
+    badge,
     sale,
   } = req.body;
 
@@ -33,6 +38,10 @@ const createProduct = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Price must be a positive number");
   }
+  if (originalPrice !== undefined && (isNaN(originalPrice) || originalPrice < 0)) {
+    res.status(400);
+    throw new Error("Original price must be a non-negative number");
+  }
 
   if (countInStock !== undefined && (isNaN(countInStock) || countInStock < 0)) {
     res.status(400);
@@ -40,10 +49,10 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   // Validate category enum
-  const validCategories = ["female", "male", "jacket", "accessory"];
+  const validCategories = ["apple", "samsung", "xiaomi", "oppo", "google", "accessory"];
   if (!validCategories.includes(category)) {
     res.status(400);
-    throw new Error("Category must be one of: female, male, jacket, accessory");
+    throw new Error("Category must be one of: apple, samsung, xiaomi, oppo, google, accessory");
   }
 
   // Validate colors array
@@ -53,15 +62,19 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   // Validate each color
-  const validColors = ["blue", "black", "pink"];
+  const validColors = ["blue", "black", "pink", "white", "lavender", "cream", "pistachio"];
   for (const color of colors) {
     if (!color.colorName || !validColors.includes(color.colorName)) {
       res.status(400);
-      throw new Error("Color must be one of: blue, black, pink");
+      throw new Error("Color must be one of: blue, black, pink, white, lavender, cream, pistachio");
     }
     if (typeof color.isAvailable !== "boolean") {
       res.status(400);
       throw new Error("Color availability must be a boolean");
+    }
+    if (color.priceAdjustment !== undefined && (isNaN(color.priceAdjustment) || color.priceAdjustment < 0)) {
+      res.status(400);
+      throw new Error("Color price adjustment must be a non-negative number");
     }
   }
 
@@ -72,15 +85,19 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   // Validate each size
-  const validSizes = ["M", "L", "XL"];
+  const validSizes = ["128GB", "256GB", "512GB", "1TB", "2TB", "Standard"];
   for (const size of sizes) {
     if (!size.sizeName || !validSizes.includes(size.sizeName)) {
       res.status(400);
-      throw new Error("Size must be one of: M, L, XL");
+      throw new Error("Size must be one of: 128GB, 256GB, 512GB, 1TB, 2TB, Standard");
     }
     if (typeof size.isAvailable !== "boolean") {
       res.status(400);
       throw new Error("Size availability must be a boolean");
+    }
+    if (size.priceAdjustment !== undefined && (isNaN(size.priceAdjustment) || size.priceAdjustment < 0)) {
+      res.status(400);
+      throw new Error("Storage price adjustment must be a non-negative number");
     }
   }
 
@@ -127,6 +144,11 @@ const createProduct = asyncHandler(async (req, res) => {
     isActive: isActive !== undefined ? isActive : true,
     colors: colors,
     sizes: sizes,
+    images: Array.isArray(images) ? images : [],
+    accessoryType: accessoryType || "",
+    originalPrice: originalPrice === undefined ? undefined : Number(originalPrice),
+    specifications: specifications || {},
+    badge: badge || "",
     sale: sale || {
       isOnSale: false,
       saleType: "percentage",
@@ -159,6 +181,11 @@ const updateProduct = asyncHandler(async (req, res) => {
     isActive,
     colors,
     sizes,
+    images,
+    accessoryType,
+    originalPrice,
+    specifications,
+    badge,
     sale,
   } = req.body;
 
@@ -169,6 +196,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (price !== undefined && (isNaN(price) || price <= 0)) {
       res.status(400);
       throw new Error("Price must be a positive number");
+    }
+    if (originalPrice !== undefined && (isNaN(originalPrice) || originalPrice < 0)) {
+      res.status(400);
+      throw new Error("Original price must be a non-negative number");
     }
 
     if (
@@ -185,6 +216,9 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.description = description || product.description;
     product.image = image || product.image;
     product.category = category?.trim() || product.category;
+    if (originalPrice !== undefined) product.originalPrice = Number(originalPrice);
+    if (specifications !== undefined) product.specifications = specifications;
+    if (badge !== undefined) product.badge = badge;
     product.countInStock =
       countInStock !== undefined
         ? parseInt(countInStock)
@@ -201,6 +235,14 @@ const updateProduct = asyncHandler(async (req, res) => {
 
     if (sizes && Array.isArray(sizes) && sizes.length > 0) {
       product.sizes = sizes;
+    }
+
+    if (images && Array.isArray(images)) {
+      product.images = images;
+    }
+
+    if (accessoryType !== undefined) {
+      product.accessoryType = accessoryType;
     }
 
     if (sale) {

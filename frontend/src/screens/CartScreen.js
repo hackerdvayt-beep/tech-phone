@@ -27,6 +27,7 @@ const CartScreen = ({ match, location, history }) => {
   const qty = Number(urlParams.get("qty")) || 1;
   const color = urlParams.get("color") || "";
   const size = urlParams.get("size") || "";
+  const variantPrice = Number(urlParams.get("price")) || null;
 
   const dispatch = useDispatch();
 
@@ -38,19 +39,44 @@ const CartScreen = ({ match, location, history }) => {
   const cart = useSelector((state) => state.cart);
   const { cartItems } = cart;
 
+  const formatVND = (price) =>
+    new Intl.NumberFormat("vi-VN").format(Number(price) || 0);
+
+  const getVariantPrice = (product, colorName, sizeName) => {
+    if (!product) return null;
+    const basePrice =
+      product.currentPrice ||
+      (product.saleInfo?.isOnSale ? product.saleInfo.salePrice : product.price);
+    const color = product.colors?.find(
+      (item) => item.colorName === colorName
+    );
+    const size = product.sizes?.find(
+      (item) => item.sizeName === sizeName
+    );
+    return (
+      Number(basePrice) +
+      Number(color?.priceAdjustment || 0) +
+      Number(size?.priceAdjustment || 0)
+    );
+  };
+
   // Color mapping for visual representation
   const colorMapping = {
     blue: "#4A90E2",
     black: "#2C2C2C",
     pink: "#FF6B9D",
+    white: "#F5F5F5",
+    lavender: "#B8A4D9",
+    cream: "#F3E9D2",
+    pistachio: "#C9D7A5",
   };
 
   // Update whenever productId, quantity, color, or size change
   useEffect(() => {
     if (productId) {
-      dispatch(addToCart(productId, qty, color, size));
+      dispatch(addToCart(productId, qty, color, size, variantPrice));
     }
-  }, [dispatch, productId, qty, color, size]);
+  }, [dispatch, productId, qty, color, size, variantPrice]);
 
   // Fetch product details for all cart items
   useEffect(() => {
@@ -113,7 +139,21 @@ const CartScreen = ({ match, location, history }) => {
     // Remove the current specific item first
     dispatch(removeSpecificFromCart(item.product, item.color, item.size));
     // Add the item with new color
-    dispatch(addToCart(item.product, item.qty, newColor, item.size));
+    const product = productDetails[item.product];
+    dispatch(
+      addToCart(
+        item.product,
+        item.qty,
+        newColor,
+        item.size,
+        item.bundleDiscountPercent === 15
+          ? Math.round(
+              getVariantPrice(product, newColor, item.size) * 0.85
+            )
+          : getVariantPrice(product, newColor, item.size),
+        item.bundleDiscountPercent || 0
+      )
+    );
   };
 
   // Handle size change for cart item
@@ -121,7 +161,21 @@ const CartScreen = ({ match, location, history }) => {
     // Remove the current specific item first
     dispatch(removeSpecificFromCart(item.product, item.color, item.size));
     // Add the item with new size
-    dispatch(addToCart(item.product, item.qty, item.color, newSize));
+    const product = productDetails[item.product];
+    dispatch(
+      addToCart(
+        item.product,
+        item.qty,
+        item.color,
+        newSize,
+        item.bundleDiscountPercent === 15
+          ? Math.round(
+              getVariantPrice(product, item.color, newSize) * 0.85
+            )
+          : getVariantPrice(product, item.color, newSize),
+        item.bundleDiscountPercent || 0
+      )
+    );
   };
 
   // Checkout
@@ -201,8 +255,8 @@ const CartScreen = ({ match, location, history }) => {
                       productDetails[item.product].sizes &&
                       productDetails[item.product].sizes.length > 0 && (
                         <div className="mt-2">
-                          <small className="text-muted">Kích thước:</small>
-                          <div className="d-flex gap-1 mt-1">
+                          <small className="text-muted">Dung lượng:</small>
+                          <div className="d-flex flex-wrap mt-1" style={{ gap: "6px" }}>
                             {productDetails[item.product].sizes
                               .filter((size) => size.isAvailable)
                               .map((size, idx) => (
@@ -223,10 +277,13 @@ const CartScreen = ({ match, location, history }) => {
                                   }
                                   className="rounded d-flex align-items-center justify-content-center"
                                   style={{
-                                    width: "30px",
-                                    height: "30px",
+                                    width: "auto",
+                                    minWidth: "68px",
+                                    height: "34px",
+                                    padding: "6px 9px",
                                     fontSize: "12px",
-                                    border: "none",
+                                    border: "1px solid #ced4da",
+                                    whiteSpace: "nowrap",
                                   }}
                                 >
                                   {size.sizeName}
@@ -236,7 +293,7 @@ const CartScreen = ({ match, location, history }) => {
                         </div>
                       )}
                   </Col>
-                  <Col md={2}>{item.price}</Col>
+                  <Col md={2}>{formatVND(item.price)} VND</Col>
                   <Col md={2}>
                     <Form.Control
                       as="select"
@@ -247,7 +304,8 @@ const CartScreen = ({ match, location, history }) => {
                             item.product,
                             Number(e.target.value),
                             item.color,
-                            item.size
+                            item.size,
+                            item.price
                           )
                         )
                       }
@@ -296,10 +354,13 @@ const CartScreen = ({ match, location, history }) => {
                 }
                 ) sản phẩm
               </h2>
-              $
-              {cartItems // Total money
-                .reduce((acc, item) => acc + item.qty * item.price, 0)
-                .toFixed(2)}
+              {formatVND(
+                cartItems.reduce(
+                  (acc, item) => acc + item.qty * item.price,
+                  0
+                )
+              )}{" "}
+              VND
             </ListGroup.Item>
             <ListGroup.Item>
               <DarkButton

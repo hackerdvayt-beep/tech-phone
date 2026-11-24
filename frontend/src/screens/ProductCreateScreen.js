@@ -21,9 +21,9 @@ const ProductCreateScreen = ({ history }) => {
   const [uploading, setUploading] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [colors, setColors] = useState([
-    { colorName: "blue", isAvailable: true },
+    { colorName: "blue", isAvailable: true, priceAdjustment: 0 },
   ]);
-  const [sizes, setSizes] = useState([{ sizeName: "M", isAvailable: true }]);
+  const [sizes, setSizes] = useState([{ sizeName: "128GB", isAvailable: true, priceAdjustment: 0 }]);
   const [isOnSale, setIsOnSale] = useState(false);
   const [saleType, setSaleType] = useState("percentage");
   const [saleValue, setSaleValue] = useState("");
@@ -206,7 +206,7 @@ const ProductCreateScreen = ({ history }) => {
 
   // Color management functions
   const addColor = () => {
-    setColors([...colors, { colorName: "blue", isAvailable: true }]);
+    setColors([...colors, { colorName: "blue", isAvailable: true, priceAdjustment: 0 }]);
   };
 
   const updateColor = (index, field, value) => {
@@ -226,7 +226,7 @@ const ProductCreateScreen = ({ history }) => {
 
   // Size management functions
   const addSize = () => {
-    setSizes([...sizes, { sizeName: "M", isAvailable: true }]);
+    setSizes([...sizes, { sizeName: "128GB", isAvailable: true, priceAdjustment: 0 }]);
   };
 
   const updateSize = (index, field, value) => {
@@ -322,9 +322,11 @@ const ProductCreateScreen = ({ history }) => {
               required
             >
               <option value="">Chọn danh mục</option>
-              <option value="female">Nữ</option>
-              <option value="male">Nam</option>
-              <option value="jacket">Áo khoác</option>
+              <option value="apple">Apple</option>
+              <option value="samsung">Samsung</option>
+              <option value="xiaomi">Xiaomi</option>
+              <option value="oppo">OPPO</option>
+              <option value="google">Google</option>
               <option value="accessory">Phụ kiện</option>
             </Form.Control>
           </Form.Group>
@@ -367,6 +369,10 @@ const ProductCreateScreen = ({ history }) => {
                   <option value="blue">Xanh dương</option>
                   <option value="black">Đen</option>
                   <option value="pink">Hồng</option>
+                  <option value="white">Trắng</option>
+                  <option value="lavender">Tím Lavender</option>
+                  <option value="cream">Kem</option>
+                  <option value="pistachio">Xanh Pistachio</option>
                 </Form.Control>
                 <Form.Check
                   type="checkbox"
@@ -376,6 +382,18 @@ const ProductCreateScreen = ({ history }) => {
                     updateColor(index, "isAvailable", e.target.checked)
                   }
                   className="mr-2"
+                />
+                <Form.Control
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={color.priceAdjustment || 0}
+                  onChange={(e) =>
+                    updateColor(index, "priceAdjustment", Number(e.target.value))
+                  }
+                  placeholder="Giá cộng theo màu"
+                  className="mr-2"
+                  style={{ maxWidth: "150px" }}
                 />
                 <Button
                   variant="danger"
@@ -405,9 +423,12 @@ const ProductCreateScreen = ({ history }) => {
                   }
                   className="mr-2"
                 >
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
+                  <option value="128GB">128GB</option>
+                  <option value="256GB">256GB</option>
+                  <option value="512GB">512GB</option>
+                  <option value="1TB">1TB</option>
+                  <option value="2TB">2TB</option>
+                  <option value="Standard">Standard</option>
                 </Form.Control>
                 <Form.Check
                   type="checkbox"
@@ -417,6 +438,18 @@ const ProductCreateScreen = ({ history }) => {
                     updateSize(index, "isAvailable", e.target.checked)
                   }
                   className="mr-2"
+                />
+                <Form.Control
+                  type="number"
+                  min="0"
+                  step="100000"
+                  value={size.priceAdjustment || 0}
+                  onChange={(e) =>
+                    updateSize(index, "priceAdjustment", Number(e.target.value))
+                  }
+                  placeholder="Giá cộng dung lượng"
+                  className="mr-2"
+                  style={{ maxWidth: "170px" }}
                 />
                 <Button
                   variant="danger"
