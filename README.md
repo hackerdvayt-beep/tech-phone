@@ -2,6 +2,15 @@
 
 TECH PHONE là website thương mại điện tử demo dành cho điện thoại thông minh và phụ kiện. Trang chủ giới thiệu các dòng máy Apple, Samsung, Xiaomi, OPPO và Google; hỗ trợ khám phá sản phẩm, so sánh cấu hình và đặt hàng trực tuyến.
 
+## Một số danh mục sản phẩm
+
+<p align="center">
+  <img src="./frontend/public/images/categories/category-samsung.png" alt="Danh mục Samsung" height="180" />
+  <img src="./frontend/public/images/categories/category-xiaomi.png" alt="Danh mục Xiaomi" height="180" />
+  <img src="./frontend/public/images/categories/category-oppo.png" alt="Danh mục OPPO" height="180" />
+  <img src="./frontend/public/images/categories/category-google.png" alt="Danh mục Google" height="180" />
+</p>
+
 ## Tính năng
 
 - Khám phá sản phẩm theo thương hiệu, khoảng giá và nhu cầu; sắp xếp theo giá hoặc mức giảm.
