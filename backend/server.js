@@ -12,6 +12,8 @@ import orderRoutes from "./routes/orderRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import bannerRoutes from "./routes/bannerRoutes.js";
 import momoRoutes from "./routes/momoRoutes.js";
+import bankPaymentRoutes from "./routes/bankPaymentRoutes.js";
+import installmentRequestRoutes from "./routes/installmentRequestRoutes.js";
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/payment/momo", momoRoutes);
+app.use("/api/payment/bank", bankPaymentRoutes);
+app.use("/api/installment-requests", installmentRequestRoutes);
 
 
 const __dirname = path.resolve();

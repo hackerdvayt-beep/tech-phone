@@ -37,39 +37,59 @@ const Header = () => {
       <Navbar
         bg="light"
         variant="light"
-        expand="md"
+        expand="xl"
         collapseOnSelect
         className="custom-navbar"
       >
         <Container>
           {/* Logo */}
           <LinkContainer to="/">
-            <Navbar.Brand className="text-dark fw-bold">Levents</Navbar.Brand>
+            <Navbar.Brand className="text-dark fw-bold">
+            TECH PHONE
+            </Navbar.Brand>
           </LinkContainer>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             {/* Left side navigation items */}
-            <Nav className="me-auto">
+            <Nav className="nav-main">
               <LinkContainer to="/products" st>
                 <Nav.Link className="text-dark">Sản phẩm</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/products?category=male">
-                <Nav.Link className="text-dark">Nam</Nav.Link>
+              <LinkContainer to="/products?category=apple">
+                <Nav.Link className="text-dark">Apple</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/products?category=female">
-                <Nav.Link className="text-dark">Nữ</Nav.Link>
+              <LinkContainer to="/products?category=samsung">
+                <Nav.Link className="text-dark">Samsung</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/products?category=jacket">
-                <Nav.Link className="text-dark">Áo khoác</Nav.Link>
+              <LinkContainer to="/products?category=xiaomi">
+                <Nav.Link className="text-dark">Xiaomi</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/products?category=oppo">
+                <Nav.Link className="text-dark">OPPO</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/products?category=google">
+                <Nav.Link className="text-dark">Google</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/products?category=accessory">
                 <Nav.Link className="text-dark">Phụ kiện</Nav.Link>
               </LinkContainer>
+              <LinkContainer to="/products?category=sale-off">
+                <Nav.Link className="text-dark">Giảm giá</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/track-order">
+                <Nav.Link className="text-dark">Tra cứu đơn</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/trade-in">
+                <Nav.Link className="text-dark">Thu cũ đổi mới</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/compare">
+                <Nav.Link className="text-dark">So sánh</Nav.Link>
+              </LinkContainer>
             </Nav>
 
             {/* Right side - Search, Account, Cart */}
-            <Nav className="ms-auto d-flex align-items-center">
+            <Nav className="d-flex align-items-center nav-utilities">
               {/* Search Bar */}
               <Form
                 className="d-flex align-items-center me-3 d-none d-md-flex"
@@ -79,7 +99,7 @@ const Header = () => {
                   placeholder="Tìm kiếm..."
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
-                  width="200px"
+                  width="140px"
                   height="38px"
                   backgroundColor="#f8f9fa"
                   borderRadius="8px"
@@ -88,7 +108,7 @@ const Header = () => {
                     marginBottom: "0",
                     marginRight: "8px",
                     minWidth: "150px",
-                    maxWidth: "250px",
+                    maxWidth: "160px",
                   }}
                 />
                 <Button
@@ -146,6 +166,11 @@ const Header = () => {
                       <LinkContainer to="/admin/orderlist">
                         <NavDropdown.Item>Quản lý đơn hàng</NavDropdown.Item>
                       </LinkContainer>
+                      <LinkContainer to="/admin/installment-requests">
+                        <NavDropdown.Item>
+                          Yêu cầu trả góp
+                        </NavDropdown.Item>
+                      </LinkContainer>
                       <NavDropdown.Divider />
                     </>
                   )}
@@ -178,26 +203,61 @@ const Header = () => {
           background-color: white !important;
           border-bottom: 1px solid #dee2e6;
         }
+        .custom-navbar .nav-main {
+          flex-wrap: nowrap;
+          align-items: center;
+        }
         .custom-navbar .navbar-nav .nav-link {
           color: black !important;
           font-weight: 500;
-          padding: 0.5rem 1rem;
+          padding: 0.45rem 0.36rem;
+          white-space: nowrap;
+          font-size: 0.73rem;
+          text-transform: uppercase;
         }
         .custom-navbar .navbar-nav .nav-link:hover {
           color: #495057 !important;
         }
         .custom-navbar .navbar-brand {
           color: black !important;
-          font-size: 1.5rem;
+          font-size: 1.1rem;
+          margin-right: 0.55rem;
+          white-space: nowrap;
         }
         .dropdown-toggle::after {
           display: none;
         }
 
         /* Responsive improvements */
-        @media (max-width: 767.98px) {
+        @media (min-width: 1200px) {
+          .custom-navbar > .container {
+            flex-wrap: nowrap;
+          }
+          .custom-navbar .nav-main {
+            flex: 1;
+            justify-content: center;
+          }
+          .custom-navbar .nav-main .nav-link {
+            padding-right: 0.28rem;
+            padding-left: 0.28rem;
+            font-size: 0.68rem;
+          }
+          .custom-navbar .navbar-collapse {
+            min-width: 0;
+          }
+          .custom-navbar .nav-utilities {
+            margin-left: auto;
+            flex-shrink: 0;
+          }
+        }
+
+        @media (max-width: 1199.98px) {
           .custom-navbar .navbar-nav .nav-link {
             padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+          }
+          .custom-navbar .navbar-nav .nav-link {
+            white-space: nowrap;
           }
           .custom-navbar .navbar-brand {
             font-size: 1.25rem;

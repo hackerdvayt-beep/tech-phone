@@ -10,6 +10,7 @@ import { createMomoPayment } from "../actions/momoActions";
 import { ORDER_CREATE_RESET } from "../constants/orderConstants";
 import { USER_DETAILS_RESET } from "../constants/userConstants";
 import DarkButton from "../components/StyledButton";
+import { calculateCheckoutPricing } from "../utils/checkoutPricing";
 
 const PlaceOrderScreen = ({ history }) => {
   const dispatch = useDispatch();
@@ -24,21 +25,9 @@ const PlaceOrderScreen = ({ history }) => {
       history.push("/payment");
     }
   }, [history, cart.shippingAddress.address, cart.paymentMethod]);
-  //   Calculate prices
-  const addDecimals = (num) => {
-    return (Math.round(num * 100) / 100).toFixed(2);
-  };
-
-  cart.itemsPrice = addDecimals(
-    cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-  );
-  cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 100);
-  cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)));
-  cart.totalPrice = (
-    Number(cart.itemsPrice) +
-    Number(cart.shippingPrice) +
-    Number(cart.taxPrice)
-  ).toFixed(2);
+  const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
+    calculateCheckoutPricing(cart.cartItems);
+  const formatVND = (price) => `${Number(price).toLocaleString("vi-VN")}₫`;
 
   const orderCreate = useSelector((state) => state.orderCreate);
   const { order, success, error } = orderCreate;
@@ -68,10 +57,14 @@ const PlaceOrderScreen = ({ history }) => {
         orderItems: cart.cartItems,
         shippingAddress: cart.shippingAddress,
         paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        taxPrice: cart.taxPrice,
-        totalPrice: cart.totalPrice,
+        installmentRequest:
+          cart.paymentMethod === "Installment"
+            ? cart.installmentRequest?._id
+            : undefined,
+        itemsPrice,
+        shippingPrice,
+        taxPrice,
+        totalPrice,
       };
 
       try {
@@ -84,7 +77,7 @@ const PlaceOrderScreen = ({ history }) => {
           // Convert total price to VND (assuming current price is in USD)
           // For demo purposes, using 1 USD = 24,000 VND
           // MoMo requires integer amount in VND (no decimals)
-          const amountInVND = parseFloat(cart.totalPrice);
+          const amountInVND = Number(totalPrice);
           console.log("Amount in VND:", amountInVND);
 
           // Create MoMo payment
@@ -118,10 +111,14 @@ const PlaceOrderScreen = ({ history }) => {
           orderItems: cart.cartItems,
           shippingAddress: cart.shippingAddress,
           paymentMethod: cart.paymentMethod,
-          itemsPrice: cart.itemsPrice,
-          shippingPrice: cart.shippingPrice,
-          taxPrice: cart.taxPrice,
-          totalPrice: cart.totalPrice,
+          installmentRequest:
+            cart.paymentMethod === "Installment"
+              ? cart.installmentRequest?._id
+              : undefined,
+          itemsPrice,
+          shippingPrice,
+          taxPrice,
+          totalPrice,
         })
       );
     }
@@ -164,7 +161,25 @@ const PlaceOrderScreen = ({ history }) => {
                 <ListGroup.Item>
                   <h2>Phương thức thanh toán</h2>
                   <strong>Phương thức: </strong>
-                  {cart.paymentMethod}
+                  {cart.paymentMethod === "Bank QR"
+                    ? "QR chuyển khoản ngân hàng"
+                    : cart.paymentMethod === "COD"
+                      ? "Thanh toán khi nhận hàng (COD)"
+                      : cart.paymentMethod === "Installment"
+                        ? "Trả góp - yêu cầu tư vấn"
+                        : cart.paymentMethod}
+                  {cart.paymentMethod === "Installment" &&
+                    cart.installmentRequest && (
+                      <p className="mb-0 mt-2">
+                        Trả trước {cart.installmentRequest.downPaymentPercent}%,
+                        kỳ hạn {cart.installmentRequest.termMonths} tháng; dự
+                        kiến{" "}
+                        {Number(
+                          cart.installmentRequest.monthlyPayment
+                        ).toLocaleString("vi-VN")}
+                        ₫/tháng.
+                      </p>
+                    )}
                 </ListGroup.Item>
 
                 <ListGroup.Item>
@@ -190,8 +205,8 @@ const PlaceOrderScreen = ({ history }) => {
                               </Link>
                             </Col>
                             <Col md={4}>
-                              {item.qty} x ${item.price} = $
-                              {item.qty * item.price}
+                              {item.qty} x {formatVND(item.price)} ={" "}
+                              {formatVND(item.qty * item.price)}
                             </Col>
                           </Row>
                         </ListGroup.Item>
@@ -210,25 +225,25 @@ const PlaceOrderScreen = ({ history }) => {
                   <ListGroup.Item>
                     <Row>
                       <Col>Sản phẩm</Col>
-                      <Col>${cart.itemsPrice}</Col>
+                      <Col>{formatVND(itemsPrice)}</Col>
                     </Row>
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <Row>
                       <Col>Giao hàng</Col>
-                      <Col>${cart.shippingPrice}</Col>
+                      <Col>{formatVND(shippingPrice)}</Col>
                     </Row>
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <Row>
                       <Col>Thuế</Col>
-                      <Col>${cart.taxPrice}</Col>
+                      <Col>{formatVND(taxPrice)}</Col>
                     </Row>
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <Row>
                       <Col>Tổng cộng</Col>
-                      <Col>${cart.totalPrice}</Col>
+                      <Col>{formatVND(totalPrice)}</Col>
                     </Row>
                   </ListGroup.Item>
                   <ListGroup.Item>

@@ -4,46 +4,31 @@ import User from "../models/userModel.js";
 import asyncHandler from "express-async-handler";
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token;
-
-  console.log("\n=== Auth Middleware Debug ===");
-  console.log("Full Authorization Header:", req.headers.authorization);
-
-  if (!req.headers.authorization?.startsWith("Bearer")) {
-    console.log("No Bearer token found");
+  const authorization = req.headers.authorization;
+  if (!authorization?.startsWith("Bearer ")) {
     res.status(401);
     throw new Error("Not authorized, no token");
   }
 
+  let decoded;
   try {
-    // Split by spacing and take the part after Bearer
-    token = req.headers.authorization.split(" ")[1];
-    console.log("Extracted Token:", token);
-
-    // Verify login
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decoded);
-    console.log("User ID from Token:", decoded.id);
-
-    // Find user
-    const user = await User.findById(decoded.id).select("-password");
-    console.log("Found User:", user);
-
-    if (!user) {
-      console.log("No user found with ID:", decoded.id);
-      res.status(401);
-      throw new Error("User not found");
-    }
-
-    req.user = user;
-    console.log("User attached to request");
-
-    next();
-  } catch (error) {
-    console.error("Auth Middleware Error:", error);
+    decoded = jwt.verify(
+      authorization.slice("Bearer ".length),
+      process.env.JWT_SECRET
+    );
+  } catch {
     res.status(401);
     throw new Error("Not authorized, token failed");
   }
+
+  const user = await User.findById(decoded.id).select("-password");
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  req.user = user;
+  next();
 });
 
 const admin = (req, res, next) => {

@@ -16,10 +16,34 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    country: {
+      type: String,
+      default: "Việt Nam",
+    },
+    birthDate: {
+      type: Date,
+    },
+    phone: {
+      type: String,
+      default: "",
+    },
     isAdmin: {
       type: Boolean,
       required: true,
       default: false,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    emailVerificationCode: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
+      select: false,
     },
   },
   {

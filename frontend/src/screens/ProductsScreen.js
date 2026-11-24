@@ -31,6 +31,7 @@ const ProductsScreen = () => {
   const currentPage = parseInt(params.pageNumber || urlParams.get("page") || 1);
   const keyword = params.keyword || urlParams.get("keyword") || "";
   const category = urlParams.get("category") || "";
+  const accessoryType = urlParams.get("type") || "";
   const minPrice = urlParams.get("minPrice") || "";
   const maxPrice = urlParams.get("maxPrice") || "";
 
@@ -38,6 +39,7 @@ const ProductsScreen = () => {
   const [filters, setFilters] = useState({
     keyword: keyword,
     category: category,
+    accessoryType: accessoryType,
     minPrice: minPrice,
     maxPrice: maxPrice,
   });
@@ -52,19 +54,38 @@ const ProductsScreen = () => {
   // Categories configuration
   const categories = [
     { key: "", label: "Tất cả danh mục" },
-    { key: "male", label: "Nam" },
-    { key: "female", label: "Nữ" },
-    { key: "jacket", label: "Áo Khoác" },
+    { key: "apple", label: "Apple" },
+    { key: "samsung", label: "Samsung" },
+    { key: "xiaomi", label: "Xiaomi" },
+    { key: "oppo", label: "OPPO" },
+    { key: "google", label: "Google" },
     { key: "accessory", label: "Phụ Kiện" },
+    { key: "sale-off", label: "Giảm giá" },
+  ];
+
+  const accessoryTypes = [
+    { key: "", label: "Tất cả phụ kiện", icon: "fas fa-border-all" },
+    { key: "case", label: "Ốp lưng, bao da", icon: "fas fa-mobile-alt" },
+    { key: "earphone", label: "Tai nghe", icon: "fas fa-headphones" },
+    { key: "charger", label: "Cáp, sạc", icon: "fas fa-bolt" },
+    { key: "keyboard", label: "Bàn phím", icon: "fas fa-keyboard" },
+    { key: "watch-band", label: "Dây đeo Apple Watch", icon: "fas fa-watch" },
+    { key: "mouse", label: "Chuột", icon: "fas fa-mouse" },
+    { key: "pen", label: "Bút cảm ứng", icon: "fas fa-pencil-alt" },
+    { key: "airtag", label: "AirTag", icon: "fas fa-location-arrow" },
+    { key: "cleaning", label: "Khăn lau màn hình", icon: "fas fa-soap" },
+    { key: "tv", label: "Apple TV", icon: "fas fa-tv" },
+    { key: "applecare", label: "Apple Care", icon: "fas fa-shield-alt" },
+    { key: "trackpad", label: "Trackpad", icon: "fas fa-mouse" },
   ];
 
   // Price ranges for quick selection
   const priceRanges = [
     { label: "Tất cả", min: "", max: "" },
-    { label: "Dưới 500K", min: "", max: "500000" },
-    { label: "500K - 1M", min: "500000", max: "1000000" },
-    { label: "1M - 2M", min: "1000000", max: "2000000" },
-    { label: "Trên 2M", min: "2000000", max: "" },
+    { label: "Dưới 5 triệu", min: "", max: "5000000" },
+    { label: "5 - 10 triệu", min: "5000000", max: "10000000" },
+    { label: "10 - 20 triệu", min: "10000000", max: "20000000" },
+    { label: "Trên 20 triệu", min: "20000000", max: "" },
   ];
 
   // Filter products based on current filters (similar to HomeScreen logic)
@@ -125,7 +146,8 @@ const ProductsScreen = () => {
     if (filters.category) {
       if (filters.category === "sale-off") {
         filtered = filtered.filter((product) =>
-          saleUtils.isProductOnSale(product)
+          saleUtils.isProductOnSale(product) ||
+          product.originalPrice > product.price
         );
       } else {
         filtered = filtered.filter(
@@ -133,6 +155,12 @@ const ProductsScreen = () => {
             product.category?.toLowerCase() === filters.category.toLowerCase()
         );
       }
+    }
+
+    if (filters.accessoryType) {
+      filtered = filtered.filter(
+        (product) => product.accessoryType === filters.accessoryType
+      );
     }
 
     // Apply price filter
@@ -164,6 +192,7 @@ const ProductsScreen = () => {
 
     if (newFilters.keyword) params.set("keyword", newFilters.keyword);
     if (newFilters.category) params.set("category", newFilters.category);
+    if (newFilters.accessoryType) params.set("type", newFilters.accessoryType);
     if (newFilters.minPrice) params.set("minPrice", newFilters.minPrice);
     if (newFilters.maxPrice) params.set("maxPrice", newFilters.maxPrice);
     if (newPage > 1) params.set("page", newPage);
@@ -195,6 +224,19 @@ const ProductsScreen = () => {
   // Handle category change
   const handleCategoryChange = (selectedCategory) => {
     const newFilters = { ...filters, category: selectedCategory };
+    if (selectedCategory !== "accessory") {
+      newFilters.accessoryType = "";
+    }
+    setFilters(newFilters);
+    updateURL(newFilters, 1);
+  };
+
+  const handleAccessoryTypeChange = (selectedType) => {
+    const newFilters = {
+      ...filters,
+      category: "accessory",
+      accessoryType: selectedType,
+    };
     setFilters(newFilters);
     updateURL(newFilters, 1);
   };
@@ -228,6 +270,7 @@ const ProductsScreen = () => {
     const clearedFilters = {
       keyword: "",
       category: "",
+      accessoryType: "",
       minPrice: "",
       maxPrice: "",
     };
@@ -250,6 +293,7 @@ const ProductsScreen = () => {
     let count = 0;
     if (filters.keyword) count++;
     if (filters.category) count++;
+    if (filters.accessoryType) count++;
     if (filters.minPrice || filters.maxPrice) count++;
     return count;
   };
@@ -264,16 +308,57 @@ const ProductsScreen = () => {
     setFilters({
       keyword: keyword,
       category: category,
+      accessoryType: accessoryType,
       minPrice: minPrice,
       maxPrice: maxPrice,
     });
-  }, [keyword, category, minPrice, maxPrice]);
+  }, [keyword, category, accessoryType, minPrice, maxPrice]);
 
   return (
     <Container>
       <Row>
         <Col>
           <h1 className="mb-4">Tất cả sản phẩm</h1>
+
+          {(!filters.category || filters.category === "accessory") && (
+            <div className="mb-4">
+              <h2 className="h4 fw-bold mb-3">Chọn loại phụ kiện Apple</h2>
+              <div
+                className="d-flex overflow-auto pb-2"
+                style={{ gap: "12px" }}
+              >
+                {accessoryTypes.map((type) => (
+                  <button
+                    key={type.key}
+                    type="button"
+                    onClick={() => handleAccessoryTypeChange(type.key)}
+                    className="btn bg-white text-dark border flex-shrink-0"
+                    style={{
+                      width: "132px",
+                      minHeight: "118px",
+                      borderRadius: "10px",
+                      borderColor:
+                        filters.accessoryType === type.key
+                          ? "#dc3545"
+                          : "#e5e7eb",
+                      boxShadow:
+                        filters.accessoryType === type.key
+                          ? "0 0 0 2px rgba(220,53,69,.15)"
+                          : "none",
+                    }}
+                  >
+                    <div className="mb-2">
+                      <i
+                        className={`${type.icon}`}
+                        style={{ fontSize: "34px", color: "#273469" }}
+                      ></i>
+                    </div>
+                    <small className="fw-semibold">{type.label}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Filter Bar */}
           <Card className="mb-4" style={{ borderRadius: "8px" }}>

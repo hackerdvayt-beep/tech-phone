@@ -20,7 +20,13 @@ import ProductEditScreen from "./screens/ProductEditScreen";
 import ProductCreateScreen from "./screens/ProductCreateScreen";
 import ProductsScreen from "./screens/ProductsScreen";
 import OrderListScreen from "./screens/OrderListScreen";
+import InstallmentRequestListScreen from "./screens/InstallmentRequestListScreen";
 import OrderSuccessScreen from "./screens/OrderSuccessScreen";
+import TradeInScreen from "./screens/TradeInScreen";
+import CompareScreen from "./screens/CompareScreen";
+import FloatingCompareBar from "./components/FloatingCompareBar";
+import OrderLookupScreen from "./screens/OrderLookupScreen";
+import SalesAssistant from "./components/SalesAssistant";
 
 const AppContent = () => {
   const location = useLocation();
@@ -42,6 +48,9 @@ const AppContent = () => {
           <Route path="/payment" component={PaymentScreen} />
           <Route path="/placeorder" component={PlaceOrderScreen} />
           <Route path="/order-success" component={OrderSuccessScreen} />
+          <Route path="/track-order" component={OrderLookupScreen} />
+          <Route path="/trade-in" component={TradeInScreen} />
+          <Route path="/compare" component={CompareScreen} />
           <Route path="/order/:id" component={OrderScreen} />
           <Route path="/products" component={ProductsScreen} />
           <Route path="/search/:keyword" component={ProductsScreen} />
@@ -67,8 +76,14 @@ const AppContent = () => {
           <Route path="/admin/product/create" component={ProductCreateScreen} />
           <Route path="/admin/product/:id/edit" component={ProductEditScreen} />
           <Route path="/admin/orderlist" component={OrderListScreen} />
+          <Route
+            path="/admin/installment-requests"
+            component={InstallmentRequestListScreen}
+          />
         </Container>
       </main>
+      <FloatingCompareBar />
+      <SalesAssistant />
       <Footer />
     </>
   );

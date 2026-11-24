@@ -75,12 +75,17 @@ const paymentMethodFromStorage = localStorage.getItem("paymentMethod")
   ? JSON.parse(localStorage.getItem("paymentMethod"))
   : null;
 
+const installmentRequestFromStorage = localStorage.getItem("installmentRequest")
+  ? JSON.parse(localStorage.getItem("installmentRequest"))
+  : null;
+
 const initialState = {
   // Get cart item and later on have a token in a initial state
   cart: {
     cartItems: cartItemsFromStorage,
     shippingAddress: shippingAddressFromStorage,
     paymentMethod: paymentMethodFromStorage,
+    installmentRequest: installmentRequestFromStorage,
   },
   userLogin: { userInfo: userInfoFromStorage },
 };
